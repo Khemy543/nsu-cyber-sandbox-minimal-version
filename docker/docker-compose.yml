@@ -12,13 +12,56 @@ services:
     volumes:
       - ../minio-data:/data
 
-  model-trainer:
+  minio-init:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.worker
+    container_name: minio-init
+    volumes:
+      - ../src:/app/src
+    command: python /app/src/init/init_minio.py
+    depends_on:
+      - storage
+      
+  federated-learner:
     image: jupyter/scipy-notebook
-    container_name: model-trainer
+    container_name: federated-learner
     ports:
       - "8888:8888"
     volumes:
-      - ../notebooks:/home/jovyan/work
-      - ../data:/home/jovyan/data
+      - ../notebooks/federated-learner:/home/jovyan/work
+      - ../data/federated-learner:/home/jovyan/data
     environment:
       - JUPYTER_TOKEN=admin
+    depends_on:
+      - storage
+      - minio-init
+
+  intrusion-detection-system:
+    image: jupyter/scipy-notebook
+    container_name: intrusion-detection-system
+    ports:
+      - "8889:8889"
+    volumes:
+      - ../notebooks/intrusion-detection-system:/home/jovyan/work
+      - ../data/intrusion-detection-system:/home/jovyan/data
+    environment:
+      - JUPYTER_TOKEN=admin
+    depends_on:
+      - storage
+      - minio-init
+
+  bias-detection-and-evaluation:
+    image: jupyter/scipy-notebook
+    container_name: bias-detection-and-evaluation
+    ports:
+      - "8810:8810"
+    volumes:
+      - ../notebooks/bias-detection-and-evaluation:/home/jovyan/work
+      - ../data/bias-detection-and-evaluation:/home/jovyan/data
+    environment:
+      - JUPYTER_TOKEN=admin
+    depends_on:
+      - storage
+      - minio-init
+  
