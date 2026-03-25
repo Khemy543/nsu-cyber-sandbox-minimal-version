@@ -24,8 +24,12 @@ env/
 # -----------------------------
 # Data (VERY IMPORTANT)
 # -----------------------------
-data/
-minio-data/
+data/*
+minio-data/*
+
+# but keep the empty folders
+!data/.gitkeep
+!minio-data/.gitkeep
 
 # -----------------------------
 # Model artifacts
