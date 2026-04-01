@@ -30,7 +30,7 @@ services:
     volumes:
       - ../projects/federated-learning:/app
       - ../data:/app/data
-    command: python /app/src/main.py
+    command: python -u /app/src/main.py
     depends_on:
       - storage
       - minio-init
