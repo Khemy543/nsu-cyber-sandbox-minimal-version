@@ -13,54 +13,37 @@ services:
       - ../minio-data:/data
 
   minio-init:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.worker
+    image: python:3.11-slim
     container_name: minio-init
+    working_dir: /app
     volumes:
       - ../src:/app/src
-    command: python /app/src/init/init_minio.py
+    command: sh -c "pip install boto3 && python /app/src/init/init_minio.py"
     depends_on:
       - storage
       
-  federated-learner:
-    image: jupyter/scipy-notebook
-    container_name: federated-learner
-    ports:
-      - "8888:8888"
+  federated-learning:
+    build:
+      context: ..
+      dockerfile: projects/federated-learning/Dockerfile
+    container_name: federated-learning
     volumes:
-      - ../notebooks/federated-learner:/home/jovyan/work
-      - ../data/federated-learner:/home/jovyan/data
-    environment:
-      - JUPYTER_TOKEN=admin
+      - ../projects/federated-learning:/app
+      - ../data:/app/data
+    command: python /app/src/main.py
     depends_on:
       - storage
       - minio-init
-
+  
   intrusion-detection-system:
-    image: jupyter/scipy-notebook
+    build:
+      context: ..
+      dockerfile: projects/intrusion-detection-system/Dockerfile
     container_name: intrusion-detection-system
-    ports:
-      - "8889:8889"
     volumes:
-      - ../notebooks/intrusion-detection-system:/home/jovyan/work
-      - ../data/intrusion-detection-system:/home/jovyan/data
-    environment:
-      - JUPYTER_TOKEN=admin
-    depends_on:
-      - storage
-      - minio-init
-
-  bias-detection-and-evaluation:
-    image: jupyter/scipy-notebook
-    container_name: bias-detection-and-evaluation
-    ports:
-      - "8810:8810"
-    volumes:
-      - ../notebooks/bias-detection-and-evaluation:/home/jovyan/work
-      - ../data/bias-detection-and-evaluation:/home/jovyan/data
-    environment:
-      - JUPYTER_TOKEN=admin
+      - ../projects/intrusion-detection-system:/app
+      - ../data:/app/data
+    command: python /app/src/main.py
     depends_on:
       - storage
       - minio-init
