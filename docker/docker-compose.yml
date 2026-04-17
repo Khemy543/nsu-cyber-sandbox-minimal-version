@@ -47,4 +47,17 @@ services:
     depends_on:
       - storage
       - minio-init
+
+  bias-detection-and-mitigation:
+    build:
+      context: ..
+      dockerfile: projects/bias-detection-and-mitigation/Dockerfile
+    container_name: bias-detection-and-mitigation
+    volumes:
+      - ../projects/bias-detection-and-mitigation:/app
+      - ../data:/app/data
+    command: python /app/main.py
+    depends_on:
+      - storage
+      - minio-init
   

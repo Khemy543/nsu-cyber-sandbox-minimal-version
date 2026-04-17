@@ -1,12 +1,16 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from pathlib import Path
 from sklearn.metrics import roc_curve, auc, confusion_matrix
 from federated_learning import federated_learning_with_early_stopping
 from evaluation import evaluate_model, calculate_metrics, print_evaluation_results
 from performance import PerformanceMonitor
 from data_preprocessing import split_data_among_clients, load_and_preprocess_data
 from model import CirrhosisPredictor
+
+RESULTS_DIR = Path("/app/results")
+RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor, num_runs=3, num_clients=20):
     all_round_accuracies = []
@@ -82,7 +86,7 @@ def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_t
         plt.grid(True)
         plt.xticks(fontsize=13)
         plt.yticks(fontsize=13)
-        plt.savefig(f'results/attack_detection_roc_run_{run + 1}.png')
+        plt.savefig(RESULTS_DIR / f'attack_detection_roc_run_{run + 1}.png')
         plt.show()
         
         # Attack detection metrics table
@@ -108,7 +112,7 @@ def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_t
         plt.title(f'Confusion Matrix - Test Run {run + 1}', fontsize=16)
         plt.xticks(fontsize=13)
         plt.yticks(fontsize=13)
-        plt.savefig(f'results/confusion_matrix_defense_fl_run_{run + 1}.png')
+        plt.savefig(RESULTS_DIR / f'confusion_matrix_defense_fl_run_{run + 1}.png')
         plt.show()
         
         print("\nPlotting ROC Curves for Model Performance:")
@@ -125,7 +129,7 @@ def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_t
         plt.yticks(fontsize=13)
         plt.legend(loc="lower right")
         plt.grid(True)
-        plt.savefig(f'results/ROC_curve_defense_fl_run_{run + 1}.png')
+        plt.savefig(RESULTS_DIR / f'ROC_curve_defense_fl_run_{run + 1}.png')
         plt.show()
         
         # Security metrics
@@ -143,7 +147,7 @@ def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_t
         plt.title(f'Confusion Matrix - Test Run {run + 1}', fontsize=16)
         plt.xticks(fontsize=13)
         plt.yticks(fontsize=13)
-        plt.savefig(f'results/cm_sec_{run + 1}.png')
+        plt.savefig(RESULTS_DIR / f'cm_sec_{run + 1}.png')
         plt.show()
         
         print("\nPlotting ROC Curve for Security Metrics:")
@@ -158,7 +162,7 @@ def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_t
         plt.xticks(fontsize=13)
         plt.yticks(fontsize=13)
         plt.legend()
-        plt.savefig(f'results/ROC_sec_{run + 1}.png')
+        plt.savefig(RESULTS_DIR / f'ROC_sec_{run + 1}.png')
         plt.show()
     
     # Accuracy trends across runs
@@ -172,7 +176,7 @@ def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_t
     plt.title('Accuracy Across Federation Rounds for 3 Test Runs', fontsize=16)
     plt.legend()
     plt.grid(True)
-    plt.savefig(f'results/acc_trend_sec_{num_runs}.png')
+    plt.savefig(RESULTS_DIR / f'acc_trend_sec_{num_runs}.png')
     plt.show()
     
     # Latency metrics table
@@ -214,7 +218,7 @@ def run_federated_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_t
     plt.legend()
     plt.grid(True, alpha=0.3, which="both")
     plt.tight_layout()
-    plt.savefig('results/performance_metrics.png')
+    plt.savefig(RESULTS_DIR / 'performance_metrics.png')
     plt.show()
 
 def run_scalability_experiment(X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor, client_counts):
@@ -264,7 +268,7 @@ def run_scalability_experiment(X_train_tensor, y_train_tensor, X_test_tensor, y_
     plt.xticks(fontsize=13)
     plt.yticks(fontsize=13)
     plt.grid(True)
-    plt.savefig('results/scalability_metrics.png')
+    plt.savefig(RESULTS_DIR / 'scalability_metrics.png')
     plt.show()
 
 def run_accuracy_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_test_tensor, file_path):
@@ -301,7 +305,7 @@ def run_accuracy_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_te
     plt.yticks(fontsize=13)
     plt.title('Accuracy vs Number of Clients', fontsize=16)
     plt.grid(True)
-    plt.savefig('results/accuracy_vs_clients.png')
+    plt.savefig(RESULTS_DIR / 'accuracy_vs_clients.png')
     plt.show()
     
     # Experiment 3: Accuracy vs Sample Size
@@ -343,5 +347,5 @@ def run_accuracy_experiments(X_train_tensor, y_train_tensor, X_test_tensor, y_te
     plt.yticks(fontsize=13)
     plt.title('Accuracy vs Sample Size', fontsize=13)
     plt.grid(True)
-    plt.savefig('results/accuracy_vs_sample_size.png')
+    plt.savefig(RESULTS_DIR / 'accuracy_vs_sample_size.png')
     plt.show()
