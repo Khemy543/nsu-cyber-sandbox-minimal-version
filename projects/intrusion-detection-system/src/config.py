@@ -68,6 +68,13 @@ class PipelineConfig:
     colsample_bytree: float
     explain_samples: int
     explain_background_size: int
+    enable_llm_explanations: bool
+    llm_model: str
+    llm_base_url: str
+    llm_api_key: str
+    llm_temperature: float
+    llm_max_tokens: int
+    llm_top_k_features: int
     skip_explain: bool
     save_predictions: bool
 
@@ -316,6 +323,45 @@ def build_parser() -> argparse.ArgumentParser:
         help="Background sample size for explainability computations.",
     )
     parser.add_argument(
+        "--enable-llm-explanations",
+        type=parse_bool,
+        default=parse_bool(os.getenv("IDS_ENABLE_LLM_EXPLANATIONS", "false")),
+        help="Enable LLM-generated natural language explanations from SHAP outputs.",
+    )
+    parser.add_argument(
+        "--llm-model",
+        default=os.getenv("IDS_LLM_MODEL", "gpt-4o-mini"),
+        help="Model name for OpenAI-compatible chat completions endpoint.",
+    )
+    parser.add_argument(
+        "--llm-base-url",
+        default=os.getenv("IDS_LLM_BASE_URL", "https://api.openai.com/v1"),
+        help="Base URL for OpenAI-compatible chat API.",
+    )
+    parser.add_argument(
+        "--llm-api-key",
+        default=os.getenv("IDS_LLM_API_KEY", ""),
+        help="API key for the configured OpenAI-compatible endpoint.",
+    )
+    parser.add_argument(
+        "--llm-temperature",
+        type=float,
+        default=float(os.getenv("IDS_LLM_TEMPERATURE", "0.4")),
+        help="Sampling temperature for LLM explanations.",
+    )
+    parser.add_argument(
+        "--llm-max-tokens",
+        type=int,
+        default=int(os.getenv("IDS_LLM_MAX_TOKENS", "400")),
+        help="Max tokens for each LLM explanation response.",
+    )
+    parser.add_argument(
+        "--llm-top-k-features",
+        type=int,
+        default=int(os.getenv("IDS_LLM_TOP_K_FEATURES", "5")),
+        help="Top-K SHAP features to include in the LLM prompt per sample.",
+    )
+    parser.add_argument(
         "--skip-explain",
         type=parse_bool,
         default=parse_bool(os.getenv("IDS_SKIP_EXPLAIN", "false")),
@@ -378,6 +424,13 @@ def parse_config() -> PipelineConfig:
         colsample_bytree=args.colsample_bytree,
         explain_samples=args.explain_samples,
         explain_background_size=args.explain_background_size,
+        enable_llm_explanations=args.enable_llm_explanations,
+        llm_model=args.llm_model,
+        llm_base_url=args.llm_base_url,
+        llm_api_key=args.llm_api_key,
+        llm_temperature=args.llm_temperature,
+        llm_max_tokens=args.llm_max_tokens,
+        llm_top_k_features=args.llm_top_k_features,
         skip_explain=args.skip_explain,
         save_predictions=args.save_predictions,
     )

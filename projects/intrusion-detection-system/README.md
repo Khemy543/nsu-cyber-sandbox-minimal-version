@@ -19,7 +19,7 @@ This sandbox service operationalizes the `X-AI-IDS-Architecture` workflow as a c
 - Produces:
   - model artifacts (`joblib`, scaler, feature list, manifest)
   - evaluation reports/plots (confusion matrices, per-class metrics, ROC)
-  - explainability outputs (SHAP global importance + beeswarm plot, LIME local explanations)
+  - explainability outputs (SHAP global importance + beeswarm plot, LIME local explanations, optional LLM narrative explanations)
 
 ## Runtime Paths in Container
 
@@ -73,6 +73,7 @@ python /app/src/main.py --mode full
 python /app/src/main.py --mode train --use-smote true
 python /app/src/main.py --mode evaluate --download-from-minio false
 python /app/src/main.py --mode explain --download-from-minio false
+python /app/src/main.py --mode explain --download-from-minio false --enable-llm-explanations true
 ```
 
 From repo root, you can also use Make targets:
@@ -90,6 +91,7 @@ Example with overrides:
 ```bash
 make preprocess PREPROCESS_SELECTION_METHOD=kbest PREPROCESS_TOP_K=20
 make train USE_SMOTE=true
+make explain ENABLE_LLM_EXPLANATIONS=true LLM_MODEL=gpt-4o-mini LLM_API_KEY=<your_key>
 ```
 
 Recommended end-to-end sequence when starting from raw NSL-KDD files:
@@ -115,6 +117,13 @@ python /app/src/main.py --mode explain --download-from-minio false
 - `--use-class-weights true|false`
 - `--use-smote true|false`
 - `--explain-samples <n>`
+- `--enable-llm-explanations true|false`
+- `--llm-model <name>`
+- `--llm-base-url <url>` (OpenAI-compatible endpoint; can point to local gateways)
+- `--llm-api-key <key>` (or env `IDS_LLM_API_KEY`)
+- `--llm-temperature <float>`
+- `--llm-max-tokens <n>`
+- `--llm-top-k-features <n>`
 - `--skip-explain true|false`
 - `make` variable overrides:
   - `DOWNLOAD_FROM_MINIO`
@@ -122,6 +131,10 @@ python /app/src/main.py --mode explain --download-from-minio false
   - `PREPROCESS_TOP_K`
   - `PREPROCESS_TARGET_COLUMN`
   - `USE_SMOTE`
+  - `ENABLE_LLM_EXPLANATIONS`
+  - `LLM_MODEL`
+  - `LLM_BASE_URL`
+  - `LLM_API_KEY`
 
 ## Artifacts
 
@@ -148,3 +161,6 @@ Saved under `/app/results/intrusion-detection-system/artifacts`:
   - optional feature selection (`kbest` or `info_gain`)
 - Label mapping for string attack names follows the 5-class NSL-KDD grouping used in your original notebooks.
 - `evaluate` and `explain` modes require existing artifacts.
+- When LLM mode is enabled, outputs are written to:
+  - `/app/results/intrusion-detection-system/explainability/llm_shap_explanations.csv`
+  - `/app/results/intrusion-detection-system/explainability/llm_shap_explanations.json`
