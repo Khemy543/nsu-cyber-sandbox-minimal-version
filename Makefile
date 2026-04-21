@@ -30,6 +30,13 @@ PREPROCESS_SAVE_CLASS_NAMES ?= true
 USE_SMOTE ?= false
 USE_CLASS_WEIGHTS ?= true
 EXPLAIN_SAMPLES ?= 5
+ENABLE_LLM_EXPLANATIONS ?= false
+LLM_MODEL ?= gpt-4o-mini
+LLM_BASE_URL ?= https://api.openai.com/v1
+LLM_API_KEY ?=
+LLM_TEMPERATURE ?= 0.4
+LLM_MAX_TOKENS ?= 400
+LLM_TOP_K_FEATURES ?= 5
 
 help:
 	@echo "IDS Make Targets:"
@@ -45,6 +52,10 @@ help:
 	@echo "  PREPROCESS_SELECTION_METHOD=none|kbest|info_gain"
 	@echo "  PREPROCESS_TOP_K=15"
 	@echo "  PREPROCESS_TARGET_COLUMN=label|binary_attack"
+	@echo "  ENABLE_LLM_EXPLANATIONS=true|false"
+	@echo "  LLM_MODEL=gpt-4o-mini"
+	@echo "  LLM_BASE_URL=https://api.openai.com/v1"
+	@echo "  LLM_API_KEY=<api_key>"
 
 check-raw:
 	@if [ "$(DOWNLOAD_FROM_MINIO)" != "true" ]; then \
@@ -96,7 +107,14 @@ explain:
 	  --test-path $(TEST_PATH) \
 	  --results-dir $(RESULTS_DIR) \
 	  --artifacts-dir $(ARTIFACTS_DIR) \
-	  --explain-samples $(EXPLAIN_SAMPLES)
+	  --explain-samples $(EXPLAIN_SAMPLES) \
+	  --enable-llm-explanations $(ENABLE_LLM_EXPLANATIONS) \
+	  --llm-model "$(LLM_MODEL)" \
+	  --llm-base-url "$(LLM_BASE_URL)" \
+	  --llm-api-key "$(LLM_API_KEY)" \
+	  --llm-temperature $(LLM_TEMPERATURE) \
+	  --llm-max-tokens $(LLM_MAX_TOKENS) \
+	  --llm-top-k-features $(LLM_TOP_K_FEATURES)
 
 full:
 	$(RUN_IDS) \
@@ -105,7 +123,14 @@ full:
 	  --train-path $(TRAIN_PATH) \
 	  --test-path $(TEST_PATH) \
 	  --results-dir $(RESULTS_DIR) \
-	  --artifacts-dir $(ARTIFACTS_DIR)
+	  --artifacts-dir $(ARTIFACTS_DIR) \
+	  --enable-llm-explanations $(ENABLE_LLM_EXPLANATIONS) \
+	  --llm-model "$(LLM_MODEL)" \
+	  --llm-base-url "$(LLM_BASE_URL)" \
+	  --llm-api-key "$(LLM_API_KEY)" \
+	  --llm-temperature $(LLM_TEMPERATURE) \
+	  --llm-max-tokens $(LLM_MAX_TOKENS) \
+	  --llm-top-k-features $(LLM_TOP_K_FEATURES)
 
 ids-pipeline: preprocess train evaluate explain
 	@echo "Completed IDS pipeline: preprocess -> train -> evaluate -> explain"

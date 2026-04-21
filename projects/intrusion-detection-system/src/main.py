@@ -156,6 +156,13 @@ def _train_and_maybe_explain(config) -> dict:
             explain_samples=config.explain_samples,
             explain_background_size=config.explain_background_size,
             random_seed=config.random_seed,
+            enable_llm_explanations=config.enable_llm_explanations,
+            llm_model=config.llm_model,
+            llm_base_url=config.llm_base_url,
+            llm_api_key=config.llm_api_key,
+            llm_temperature=config.llm_temperature,
+            llm_max_tokens=config.llm_max_tokens,
+            llm_top_k_features=config.llm_top_k_features,
         )
 
     summary = {
@@ -221,6 +228,13 @@ def _evaluate_or_explain_with_existing_artifacts(config) -> dict:
         explain_samples=config.explain_samples,
         explain_background_size=config.explain_background_size,
         random_seed=config.random_seed,
+        enable_llm_explanations=config.enable_llm_explanations,
+        llm_model=config.llm_model,
+        llm_base_url=config.llm_base_url,
+        llm_api_key=config.llm_api_key,
+        llm_temperature=config.llm_temperature,
+        llm_max_tokens=config.llm_max_tokens,
+        llm_top_k_features=config.llm_top_k_features,
     )
     summary["explainability"] = explain_report
     return summary
